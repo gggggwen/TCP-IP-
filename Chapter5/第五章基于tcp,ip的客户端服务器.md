@@ -21,7 +21,8 @@ TCP套接字的io缓冲有如下 特性:
 
 ###     5.1.2TCP连接的三次握手
 
-![屏幕截图 2024-06-26 212242](C:\Users\32939\Desktop\github_repo\TCP-IP-StudyNotes\Chapter5\屏幕截图 2024-06-26 212242.png)
+![image](https://github.com/gggggwen/TCP-IP-StudyNotes/assets/162149042/215ab94b-3d52-4842-983e-880d1e8be3a9)
+
 
 在图中: 
 
