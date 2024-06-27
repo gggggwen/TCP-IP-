@@ -10,7 +10,8 @@
 
 实际上,**当输入数据时,write()函数会将数据写入输出缓冲中,**并在某一个时刻会将数据发出,而并非write了多少就直接发到网络上。同理,当数据到达目标主机的目标端口号的套接字,**其实数据也会被写入到输入缓冲**并在某一时刻被读取。
 
-![屏幕截图 2024-06-26 155026](C:\Users\32939\Desktop\github_repo\TCP-IP-StudyNotes\Chapter5\屏幕截图 2024-06-26 155026.png)
+![image](https://github.com/gggggwen/TCP-IP-StudyNotes/assets/162149042/890ccdfa-4429-4b2c-9722-709be55b137e)
+
 
 TCP套接字的io缓冲有如下 特性:
 
