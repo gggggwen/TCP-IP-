@@ -10,7 +10,7 @@
 
 实际上,**当输入数据时,write()函数会将数据写入输出缓冲中,**并在某一个时刻会将数据发出,而并非write了多少就直接发到网络上。同理,当数据到达目标主机的目标端口号的套接字,**其实数据也会被写入到输入缓冲**并在某一时刻被读取。
 
-![image-20240626155032988](C:\Users\32939\AppData\Roaming\Typora\typora-user-images\image-20240626155032988.png)
+![屏幕截图 2024-06-26 155026](C:\Users\32939\Desktop\github_repo\TCP-IP-StudyNotes\Chapter5\屏幕截图 2024-06-26 155026.png)
 
 TCP套接字的io缓冲有如下 特性:
 
@@ -21,7 +21,7 @@ TCP套接字的io缓冲有如下 特性:
 
 ###     5.1.2TCP连接的三次握手
 
-![image-20240626212250562](C:\Users\32939\AppData\Roaming\Typora\typora-user-images\image-20240626212250562.png)
+![屏幕截图 2024-06-26 212242](C:\Users\32939\Desktop\github_repo\TCP-IP-StudyNotes\Chapter5\屏幕截图 2024-06-26 212242.png)
 
 在图中: 
 
@@ -41,6 +41,6 @@ int accept(int serv_sock,struct sockaddr* ,stelen_t)
 
    **客户端**                                                                                           **服务器端**
 
-![image-20240626213417540](C:\Users\32939\AppData\Roaming\Typora\typora-user-images\image-20240626213417540.png)
+![屏幕截图 2024-06-26 213341](C:\Users\32939\Desktop\github_repo\TCP-IP-StudyNotes\Chapter5\屏幕截图 2024-06-26 213341.png)
 
 详情见[TCP/IP面试秘籍](https://xiaolincoding.com/network/3_tcp/tcp_interview.html#%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%8C%A5%E6%89%8B%E4%B8%A2%E5%A4%B1%E4%BA%86-%E4%BC%9A%E5%8F%91%E7%94%9F%E4%BB%80%E4%B9%88)
