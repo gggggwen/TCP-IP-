@@ -8,7 +8,8 @@
 
 在TCP套接字中为了能够实现双向数据交互,因此在**套接字中会生成两种流**
 
-![int](C:\Users\32939\AppData\Roaming\Typora\typora-user-images\image-20240702173255744.png)
+![image](https://github.com/gggggwen/TCP-IP-StudyNotes/assets/162149042/d812a0c9-de3b-4ba3-9e2b-3566062f7a86)
+
 
 ## 7.2shutdown函数
 
@@ -31,8 +32,8 @@ howto->传递断开方式的信息:
 ## 7.3基于半关闭的文件传输程序
 
 
+![image](https://github.com/gggggwen/TCP-IP-StudyNotes/assets/162149042/d8d9e024-d95e-4195-aa49-86583759f4c2)
 
-<img src="C:\Users\32939\Desktop\github_repo\TCP-IP-StudyNotes\Chapter7\屏幕截图 2024-07-02 174418.png" alt="屏幕截图 2024-07-02 174418" style="zoom:67%;" />
 
 ​                             原理大致如下:服务器发送到*EOF*预示文件传输结束,随后半关闭服务器端连接(shutdown!!!!),客户端随后向服务器发送"Thank you",最后关闭连接。
 
