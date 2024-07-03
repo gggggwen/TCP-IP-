@@ -8,7 +8,8 @@
 
 在TCP套接字中为了能够实现双向数据交互,因此在**套接字中会生成两种流**
 
-![int](C:\Users\32939\AppData\Roaming\Typora\typora-user-images\image-20240702173255744.png)
+![image](https://github.com/gggggwen/TCP-IP-StudyNotes/assets/162149042/d812a0c9-de3b-4ba3-9e2b-3566062f7a86)
+
 
 ## 7.2shutdown函数
 
