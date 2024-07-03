@@ -113,4 +113,4 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 ssize_t write(int fd ,(void*) bf ,size_t nbytes)
 ```
 
-- **返回值说明 :** size_t 返回值返回的是实际写出到文件的 基本单元 个数 ;
+- **返回值说明 :** size_t 返回值返回的是实际写出到文件的 基本单元 个数 
