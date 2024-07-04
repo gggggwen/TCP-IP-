@@ -115,3 +115,4 @@ ssize_t write(int fd ,(void*) bf ,size_t nbytes)
 ```
 
 - **返回值说明 :** size_t 返回值返回的是实际写出到文件的 基本单元 个数 
+- 为什么说ptr bf都为void* 类型 ? 这是因为**指针指向对象不明确**。但是在void*指针标准化之前,对于不确定指向对象*  也会 用**(char *)指针**
