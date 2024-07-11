@@ -42,7 +42,7 @@ int accept(int serv_sock,struct sockaddr* ,stelen_t)
 ###   5.1.3TCP连接断开的四次挥手
 
    **客户端**                                                                                           **服务器端**
-![image](https://github.com/gggggwen/TCP-IP-StudyNotes/assets/162149042/ead9320e-2598-4bee-b838-a0a9c5270132)
+<img src="https://github.com/gggggwen/TCP-IP-StudyNotes/assets/162149042/ead9320e-2598-4bee-b838-a0a9c5270132" alt="image" style="zoom:67%;" />
 
 
 详情见[TCP/IP面试秘籍](https://xiaolincoding.com/network/3_tcp/tcp_interview.html#%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%8C%A5%E6%89%8B%E4%B8%A2%E5%A4%B1%E4%BA%86-%E4%BC%9A%E5%8F%91%E7%94%9F%E4%BB%80%E4%B9%88)
