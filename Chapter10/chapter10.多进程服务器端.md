@@ -90,7 +90,7 @@ pid_t waitpid(pid_t pid , int*statloc , int options);
 
 
 
-## 10.3 信号处理
+## 10.3 信号处理**
 
 - #### 信号处理机制(Signal Handling)
 
@@ -186,8 +186,236 @@ sigemptyset(&act.sa_mask);
 act.sa_flags = 0 ;
 ```
 
+- **为什么需要传入act的地址**?
+
+  
 
 
 
+###  10.3.4 实现杀死僵尸子进程
 
-###  10.4 实子进程现杀死僵尸
+
+
+```c++
+void sig_handler(int sig)
+{
+    if(sig ==SIGCHLD)
+    {
+        int status ;
+        waitpid(-1, &status, WNOHANG);
+        if(WIFEXITED(status))
+        {
+            printf("the child proc returned %d\n",(WEXITSTATUS(status))); //日志
+        }
+    }
+}
+
+int main()
+{
+    //在初始化阶段设置好sigaction 
+    pid_t pid ; 
+    struct sigaction act ;
+    act.sa_handler = sig_handler;
+    act.sa_flags = 0; //default
+    sigemptyset(act.sa_mask);
+    
+    pid = fork();
+    if(pid == 0) //child
+    {
+        ...
+    }
+    else if(pid > 0 ) //father
+    {
+        ...
+    }
+}
+```
+
+- 通过sigaction函数, **忽略了SIGCHLD信号**`(此处忽略并不是不处理的意思)`,并带来如下效果:
+  - 当一个子进程终止时，如果父进程忽略了 `SIGCHLD` 信号，**子进程会自动被回收**（不会成为僵尸进程）。这意味着子进程的终止状态会被立即丢弃，系统不会保留其信息供父进程通过 `wait()` 或 `waitpid()` 调用获取。
+  - 这种方式可以**防止父进程必须显式地调用** `wait()` 或 `waitpid()` 来清理子进程资源。
+
+
+
+## 10.4 实现基于多进程的并发服务器
+
+- **初始化阶段**
+
+```c++
+	int serv_sock, clnt_sock;
+	struct sockaddr_in serv_adr, clnt_adr;
+	
+	pid_t pid;
+	struct sigaction act;
+	socklen_t adr_sz;
+	int str_len, state;
+	char buf[BUF_SIZE];
+	if(argc!=2) {
+		printf("Usage : %s <port>\n", argv[0]);
+		exit(1);
+	}
+
+	act.sa_handler=read_childproc;
+	sigemptyset(&act.sa_mask);
+	act.sa_flags=0;
+	state=sigaction(SIGCHLD, &act, 0); //忽略子进程终止信号,使得父进程不会因为需要wait而阻塞
+	serv_sock=socket(PF_INET, SOCK_STREAM, 0);
+	memset(&serv_adr, 0, sizeof(serv_adr));//一定要记得memset初始化所有字节值都为0
+	serv_adr.sin_family=AF_INET;
+	serv_adr.sin_addr.s_addr=htonl(INADDR_ANY);
+	serv_adr.sin_port=htons(atoi(argv[1]));
+
+```
+
+
+
+- **封装并将套接字进入监听状态**
+
+```c++
+	if(bind(serv_sock, (struct sockaddr*) &serv_adr, sizeof(serv_adr))==-1)
+		error_handling("bind() error");
+	if(listen(serv_sock, 5)==-1)
+		error_handling("listen() error");
+```
+
+
+
+####      10.4.3**服务器客户端交互过程**(太重要了)
+
+父进程负责监听 子进程负责连接传输
+
+```c++
+	while(1)
+	{
+		adr_sz=sizeof(clnt_adr);
+		clnt_sock=accept(serv_sock, (struct sockaddr*)&clnt_adr, &adr_sz);
+		if(clnt_sock==-1)
+			continue;
+		else
+			puts("new client connected...");
+		pid=fork();
+		if(pid==-1)
+		{
+			close(clnt_sock);
+			continue;
+		}
+		if(pid==0)
+		{
+			close(serv_sock);
+			while((str_len=read(clnt_sock, buf, BUF_SIZE))!=0)
+				write(clnt_sock, buf, sr_len);
+			
+			close(clnt_sock);
+			puts("client disconnected...");
+			return 0;
+		}
+		else
+			close(clnt_sock); //父进程需要关闭连接套接字
+	}
+	close(serv_sock);
+	return 0;
+```
+
+- 首先说明一下有关accept报错处理:
+
+  ```c++
+  clnt_sock= accept(serv_sock , (struct sockaddr*)&clnt_addr,addr_Sz);
+  if(clnt_sock==-1)
+      continue; 
+  
+  ```
+
+  为什么不进行日志处理,标记报错? 计算机while循环处理很快。 在大多数时间段计算机不会收到任何连接请求,如果说此时仅进行打印报错不跳过 ,**后续程序还会继续创建进程,可是进程的任务是输入输出数据的,你的连接都没建立,怎么传输?**因此当clnt_sock =-1 时需要调用continue
+
+
+
+- 其次是关于进程创建
+
+  ```c++
+  if(pid == -1)
+  {
+      continue;
+  }
+  if(pid==0)
+  {
+      .....
+  }
+  else 
+  {
+      .....
+  }
+  ```
+
+  可以学一下这种模式
+
+
+
+- 最后是关于数据读写
+
+  ```
+  if(pid ==0)
+  {
+    close(serv_sock); //关闭监听套接字避免占用过多系统资源
+    int str_len ;
+    while((str_len = read(clnt_sock , mesg ,BUF_SZ))!=0)
+    {
+       write(clnt_sock, buf, sr_len);
+    }
+    puts("connection disconnected\n");
+    close(clnt_sock);
+  }
+  ```
+
+  
+
+
+
+### 10.5  实现具有I/O分割程序的客户端
+
+原理很简单: 就是父进程负责读数据  子进程负责写数据
+
+```c++
+int main
+{    
+.......
+connect(sock , (Struct sockaddr*)&serv_addr , sizeof(serv_addr));
+.......
+if(pid == 0)
+{
+    write_mesg(sock ,buf);
+}
+else 
+{
+    read_mesg(sock , buf);
+    close(Sock);
+    return 0 ;
+}
+.....
+}
+
+void write_mesg(int sock ,char*buf)
+{
+    int str_len ;
+    while(1)
+    {
+        fgets(buf,BUF_SZ , stdin);
+        if(!strcmp(buf , "q\n"))
+        {
+            shutdown(sock , SHUT_WR);
+            return ;
+        }
+    }
+}
+```
+
+- #### Q:为什么可以不在子进程中关闭套接字?
+
+**文件描述符的继承和关闭**：
+
+- 当父进程创建子进程时，子进程继承父进程的文件描述符。尽管它们是独立的文件描述符，但它们指向相同的内核对象。
+- 如果子进程没有显式地关闭套接字，而是终止了，子进程中的文件描述符将自动被操作系统关闭。这是因为操作系统会在进程退出时清理其打开的文件描述符。
+
+**文件描述符引用计数**：
+
+- 内核中套接字对象的生命周期由引用计数来管理。每个进程对同一个套接字对象持有一个文件描述符，引用计数就会增加。
+- 当一个进程关闭文件描述符时，引用计数减少。只有当所有引用都被关闭（引用计数降到零）时，内核才会释放该套接字对象及其相关资源。
