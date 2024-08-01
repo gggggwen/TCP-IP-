@@ -11,9 +11,9 @@ pid_t fork(void);
 //成功返回*子进程id* 失败返回 -1
 ```
 
-- 父进程: fork返回子进程id
+- 父进程: fork  返回子进程id
 
-- 子进程 : fork  返回0
+- 子进程: fork  返回0
 
   ```c++
   int pid =fork();
@@ -65,15 +65,20 @@ pid_t wait(int* statloc);
 
 - WIFEXITED 子进程正常结束返回true
 - WEXITSTATUS 返回子进程的返回值
+- 其中，`wstatus` 可以是 `NULL`，表示父进程不关心子进程的退出状态。
 
 ```c++
 int status ;
 printf("child process returned : %d",WEXITSTATUS(status));
 ```
 
+
+
 - #### 使用wait需谨慎!
 
   如果在使用wait时,无终止子进程**,那么父进程将进入阻塞状态,**直至有子进程终止
+
+
 
 
 
@@ -87,10 +92,13 @@ pid_t waitpid(pid_t pid , int*statloc , int options);
 - pid : 等待目标子进程的pid 如果传入-1 和wait差不多
 - 同wait
 - 可以传递头文件sys/wait.h 中声明的常量 WNOHANG ,即使无终止子进程,不会进入阻塞状态
+- 其中，`wstatus` 可以是 `NULL`，表示父进程不关心子进程的退出状态。
 
 
 
-## 10.3 信号处理**
+
+
+## 10.3 信号处理
 
 - #### 信号处理机制(Signal Handling)
 
@@ -120,7 +128,7 @@ void (*signal(int signo , void(*handler)(int)))(int);
 
 
 
-###     10.3.2 重要的信号参数(int signo)
+###     10.3.2 int signo 一些信号参数
 
 - **SIGALRM: 已经到达alarm函数注册的时间**
 - **SIGINT :通过获取键盘Ctrl+C 而产生的信号**
@@ -139,14 +147,12 @@ unsigned int alarm(unsigned int seconds);
 
 - 如果未设置信号SIGALARM的处理函数，那么alarm()默认处理终止进程。
 
-- 函数返回值：如果在seconds秒内再次调用了alarm函数设置了新的闹钟，则后面定时器的设置将覆盖前面的设置，即之前设置的秒数被新的闹钟时间取代；
+- 函数返回值：如果在seconds秒内再次调用了alarm函数设置了新的闹钟，则后面定时器的设置将覆盖前面的设置，即之前设置的秒数被新的闹钟时间取代；<font color = pppblue>**(可以选择在信号处理函数中重置时钟)**</font>
 
-- 当参数seconds为0时，之前设置的定时器闹钟将被取消，并将剩下的时间返回
-
-**常见示例timeout函数**
+- 当参数seconds为0时，之前设置的定时器闹钟将被取消，并将剩下的时间返**常见示例timeout函数**
 
 ```c++
-void timeout(int sig)
+void timeout(int sig) //信号处理函数的一种
 {
     if(sig == SIGALRM)
     {
@@ -218,7 +224,7 @@ int main()
     act.sa_handler = sig_handler;
     act.sa_flags = 0; //default
     sigemptyset(act.sa_mask);
-    
+    sigaction(SIGCHLD , &act , 0);
     pid = fork();
     if(pid == 0) //child
     {
@@ -237,13 +243,33 @@ int main()
 
 
 
+
+
+### 10.3.5 信号处理的应用场景
+
+`sigaction` 和其他与信号处理相关的函数在以下场景中是非常有用的：
+
+1. **进程间通信**：在多进程环境中，信号用于进程间的同步和通信。例如，父进程可以使用信号来通知子进程执行某些操作，或者子进程可以向父进程报告状态变化。
+2. **处理外部中断**：某些程序需要对外部事件做出反应，比如接收到特定的硬件中断（如键盘中断、网络数据到达等）。使用信号处理可以捕捉这些中断并进行相应的处理。
+3. **处理异常情况**：在程序运行期间，可能会遇到各种异常情况，例如除零错误、非法内存访问等。通过信号处理函数，程序可以捕捉这些异常并采取适当的措施（如记录日志、清理资源等），而不是直接崩溃。
+4. **定时操作**：某些应用需要定期执行某些任务，可以使用定时信号（如`SIGALRM`）来实现定时操作。例如，一个服务器程序可能需要定期检查连接的健康状态。
+5. **优雅终止程序**：当用户发送终止信号（如`SIGINT`，通常是通过Ctrl+C发送）时，程序可以捕捉这个信号并进行资源清理、保存状态等操作，以优雅地终止运行。
+6. **重载配置文件**：一些长时间运行的服务程序需要在不停止服务的情况下重新加载配置文件，可以通过信号（如`SIGHUP`）来触发重载操作。
+7. **进程状态监控**：父进程可以使用`SIGCHLD`信号来监控子进程的状态变化（如退出、暂停等），从而采取相应的措施（如回收资源、重新启动子进程等）。
+8. **处理系统资源限制**：当程序消耗的资源超出系统限制时，系统会发送相应的信号（如`SIGXCPU`、`SIGXFSZ`等）。通过信号处理，可以及时处理这些情况，避免程序异常终止。
+
+在这些场景中，使用`sigaction`等函数可以提供更灵活和可靠的信号处理机制。例如，与旧的`signal`函数相比，`sigaction`提供了更丰富的功能和更好的可移植性，可以更精细地控制信号处理行为。
+
+
+
 ## 10.4 实现基于多进程的并发服务器
 
 - **初始化阶段**
 
 ```c++
 	int serv_sock, clnt_sock;
-	struct sockaddr_in serv_adr, clnt_adr;
+	struct sockaddr_in  serv_adr ;
+    struct sockaddr_in clnt_adr ;
 	
 	pid_t pid;
 	struct sigaction act;
@@ -288,22 +314,23 @@ int main()
 	while(1)
 	{
 		adr_sz=sizeof(clnt_adr);
+        
 		clnt_sock=accept(serv_sock, (struct sockaddr*)&clnt_adr, &adr_sz);
 		if(clnt_sock==-1)
 			continue;
 		else
 			puts("new client connected...");
-		pid=fork();
+		pid=fork(); //创建子进程
 		if(pid==-1)
 		{
-			close(clnt_sock);
+			close(clnt_sock);//进程创建失败关闭连接
 			continue;
 		}
 		if(pid==0)
 		{
-			close(serv_sock);
+			close(serv_sock);//子进程需要关闭监听套接字
 			while((str_len=read(clnt_sock, buf, BUF_SIZE))!=0)
-				write(clnt_sock, buf, sr_len);
+				write(clnt_sock, buf, str_len);
 			
 			close(clnt_sock);
 			puts("client disconnected...");
@@ -370,7 +397,7 @@ int main()
 
 
 
-### 10.5  实现具有I/O分割程序的客户端
+## 10.5  实现具有I/O分割程序的客户端
 
 原理很简单: 就是父进程负责读数据  子进程负责写数据
 
