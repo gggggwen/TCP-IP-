@@ -425,7 +425,7 @@ void write_mesg(int sock ,char*buf)
     int str_len ;
     while(1)
     {
-        fgets(buf,BUF_SZ , stdin);
+        fgets(buf, BUF_SZ , stdin);
         if(!strcmp(buf , "q\n"))
         {
             shutdown(sock , SHUT_WR);

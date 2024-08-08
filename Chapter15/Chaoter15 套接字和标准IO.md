@@ -109,7 +109,7 @@ int fileno(FILE* stream);
 int fflush(FILE*stream);
 ```
 
-用于刷新`Stream(流)`的输入缓冲区的数据,此函数强制将给定输出或更新`Stream(流)`的所有缓冲数据写入文件,<font color=red>**但是当应用到输入流时,其行为未知**</font>
+用于刷新`Stream(流)`的输入缓冲区的数据,此函数强制将给定输出或更新`Stream(流)`的所有缓冲数据并写入文件,<font color=red>**但是当应用到输入流时,其行为未知**</font>
 
 ```c
    FILE *file = fopen("example1.txt", "w");
