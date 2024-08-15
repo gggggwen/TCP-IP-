@@ -99,7 +99,7 @@ int main()
     while(1)
     {
         int res ; 
-        temp = reads ;//每次轮询之前都需要进行拷贝
+        temp = reads ;//每次轮询之前都需要进行拷贝,传递监视对象的信息
         timeout.tv_sec =5;
         timeout.tv_usec = 0;
         
@@ -121,4 +121,3 @@ int main()
 
 
 
-## 12.4 select模型的一些弊端
