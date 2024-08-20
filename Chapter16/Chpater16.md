@@ -1,6 +1,6 @@
 # Chapter 16 关于I/O分流
 
-
+<font color=red>阅读本章 如果有知识遗忘请看第十五章</font>
 
 ## 16.1 对比第十章实现TCP的I/O分割
 
@@ -51,8 +51,6 @@
 服务器端先向客户端打招呼,而后客户端读取数据 并向服务器端发送`"FROM CLIENT: Thank you! \n"`
 
 但是服务端未收到 , <font color =red>**说明 `fclose(fpwrite)`关闭了套接字**</font>
-
-<img src="./TCP-IP-StudyNotes/phtoto/image-20240808155959029.png" alt="image-20240808155959029" style="zoom:80%;" />
 
 
 
